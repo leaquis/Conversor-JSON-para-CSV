@@ -25,12 +25,45 @@ function jsonToCsv(json) {
     return csvRows.join("\n");
 }
 
+function csvToJson(csv) {
+    const lines = csv.split("\n");
+    const headers = lines[0].split(",");
+    const json = [];
+
+    for (let i = 1; i < lines.length; i++) {
+        const values = lines[i].splite(",");
+        const row = {}
+        
+        for(let j = 0; j < headers.length; j++){
+            let value = values[j]
+
+            if (value[0] === "{" || value[0] === "[" ) {
+                value = JSON.parse(value)
+            }
+
+            row[headers[j]] = value;
+        }
+
+        json.push(row)
+    }
+
+    return json;
+}
+
 jsonToCsvButton.addEventListener("click", function() {
     const json = JSON.parse(converterInput.value.trim());
     const csv = jsonToCsv(json);
 
     downloadCsv(csv);
 });
+
+csvToJsonButton.addEventListener("click", function() {
+
+    const csv = converterInput.value.trim()
+    const json = csvToJson(csv);
+
+    displayJson(json);
+})
 
 function downloadCsv(csv) {
     const downloadLink = document.createElement("a")
@@ -45,4 +78,12 @@ function downloadCsv(csv) {
     downloadLink.click()
 
     document.body.removeChild(downloadLink);
+}
+
+function displayJson(json){
+    const resultArea = document.createElement("pre")
+
+    resultArea.textContent = JSON.stringify(json, null, 2);
+
+    document.body.appendChild(resultArea);
 }
